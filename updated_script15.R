@@ -2,7 +2,7 @@
 
 
 # This script analyses data from the DATA worksheet and saves in the ANALYSIS worksheet.
-
+# 
 # delete all data in environment:
 {
   rm(list = ls(all = TRUE))
@@ -1890,7 +1890,7 @@
     ungroup() %>%
     select(-c(Month, Year))
 
-
+} # end of batch original SSD code
   # ============================================== SAVE/EXPORT ==========================================================
 
 
@@ -1898,17 +1898,17 @@
 
   # Load the analysis workbook:
 
-  wb <- loadWorkbook("JMMI_analysis.xlsx")
-
+  # wb <- loadWorkbook("JMMI_analysis.xlsx")
+  wb <- loadWorkbook("./JMMI_template.xlsx")
+  
   # Remove all the filters in the analysis worksheet to prevent it from corrupting.
-
   removeFilter(wb, "dashboard")
   removeFilter(wb, "functionality")
   removeFilter(wb, "quotation")
   removeFilter(wb, "availability")
-  removeFilter(wb, "median2")
+  removeFilter(wb, "median")
   removeFilter(wb, "median_chg_1m")
-  removeFilter(wb, "median_chg_3m")
+  # removeFilter(wb, "median_chg_3m")
   removeFilter(wb, "median_chg_long")
   removeFilter(wb, "median_wholesale")
   removeFilter(wb, "minmax")
@@ -1917,31 +1917,31 @@
   removeFilter(wb, "all_prices_wholesale")
   removeFilter(wb, "boxplot")
   removeFilter(wb, "supply")
-  removeFilter(wb, "all_supply")
+  # removeFilter(wb, "all_supply")
   removeFilter(wb, "road")
-  removeFilter(wb, "all_roads")
+  # removeFilter(wb, "all_roads")``
   removeFilter(wb, "border")
   removeFilter(wb, "stock_level")
   removeFilter(wb, "restock_raw")
-  removeFilter(wb, "restocked_raw")
+  # removeFilter(wb, "restocked_raw")
   removeFilter(wb, "restock_duration")
   removeFilter(wb, "all_stocks")
   removeFilter(wb, "feedback_raw")
   removeFilter(wb, "feedback_availability")
   removeFilter(wb, "quotation_raw")
   removeFilter(wb, "quotation_feedback")
-  removeFilter(wb, "median_raw")
-  removeFilter(wb, "median_chg_overall_1m")
-  removeFilter(wb, "median_chg_overall_3m")
-  removeFilter(wb, "median_chg_long")
-  removeFilter(wb, "median_chg_overall_long")
-  removeFilter(wb, "median_wholesale_raw")
-  removeFilter(wb, "max_raw")
-  removeFilter(wb, "min_raw")
+  # removeFilter(wb, "median_raw")
+  # removeFilter(wb, "median_chg_overall_1m")
+  # removeFilter(wb, "median_chg_overall_3m")
+  # removeFilter(wb, "median_chg_long")
+  # removeFilter(wb, "median_chg_overall_long")
+  # removeFilter(wb, "median_wholesale_raw")
+  # removeFilter(wb, "max_raw")
+  # removeFilter(wb, "min_raw")
   removeFilter(wb, "all_prices_wholesale")
-  removeFilter(wb, "stock_level_raw")
-  removeFilter(wb, "border_raw")
-  removeFilter(wb, "road_raw")
+  # removeFilter(wb, "stock_level_raw")
+  # removeFilter(wb, "border_raw")
+  # removeFilter(wb, "road_raw")
   removeFilter(wb, "restock_constraints")
   removeFilter(wb, "modalities")
   removeFilter(wb, "transport")
@@ -1952,7 +1952,7 @@
   removeFilter(wb, "mobile_money_no")
   removeFilter(wb, "nfi_trade")
   removeFilter(wb, "local_trade")
-  removeFilter(wb, "wholesale_volume")
+  # removeFilter(wb, "wholesale_volume")
 
   # For each dataframe, delete the existing data (1st line) and then save the new data (2nd line):
 
@@ -1962,44 +1962,44 @@
   deleteData(wb, sheet = "availability", rows = 1:100, cols = 1:50, gridExpand = TRUE)
   writeData(wb, sheet = "availability", availability, colNames = TRUE)
 
-  deleteData(wb, sheet = "median_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
-  writeData(wb, sheet = "median_raw", median, colNames = TRUE)
-
-  deleteData(wb, sheet = "median_raw_etb", rows = 1:100, cols = 1:50, gridExpand = TRUE)
-  writeData(wb, sheet = "median_raw_etb", median.etb, colNames = TRUE)
+  # deleteData(wb, sheet = "median_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
+  # writeData(wb, sheet = "median_raw", median, colNames = TRUE)
+  # 
+  # deleteData(wb, sheet = "median_raw_etb", rows = 1:100, cols = 1:50, gridExpand = TRUE)
+  # writeData(wb, sheet = "median_raw_etb", median.etb, colNames = TRUE)
 
   deleteData(wb, sheet = "median_chg_1m", rows = 1:100, cols = 1:70, gridExpand = TRUE)
   writeData(wb, sheet = "median_chg_1m", median.chg.1m, colNames = TRUE)
 
-  deleteData(wb, sheet = "median_chg_3m", rows = 1:100, cols = 1:70, gridExpand = TRUE)
-  writeData(wb, sheet = "median_chg_3m", median.chg.3m, colNames = TRUE)
+  # deleteData(wb, sheet = "median_chg_3m", rows = 1:100, cols = 1:70, gridExpand = TRUE)
+  # writeData(wb, sheet = "median_chg_3m", median.chg.3m, colNames = TRUE)
 
   deleteData(wb, sheet = "median_chg_long", rows = 1:100, cols = 1:70, gridExpand = TRUE)
   writeData(wb, sheet = "median_chg_long", median.chg.long, colNames = TRUE)
 
-  deleteData(wb, sheet = "median_chg_overall_1m", rows = 1:100, cols = 1:70, gridExpand = TRUE)
-  writeData(wb, sheet = "median_chg_overall_1m", median.chg.overall.1m, colNames = TRUE)
+  # deleteData(wb, sheet = "median_chg_overall_1m", rows = 1:100, cols = 1:70, gridExpand = TRUE)
+  # writeData(wb, sheet = "median_chg_overall_1m", median.chg.overall.1m, colNames = TRUE)
 
-  deleteData(wb, sheet = "median_chg_overall_3m", rows = 1:100, cols = 1:70, gridExpand = TRUE)
-  writeData(wb, sheet = "median_chg_overall_3m", median.chg.overall.3m, colNames = TRUE)
+  # deleteData(wb, sheet = "median_chg_overall_3m", rows = 1:100, cols = 1:70, gridExpand = TRUE)
+  # writeData(wb, sheet = "median_chg_overall_3m", median.chg.overall.3m, colNames = TRUE)
 
-  deleteData(wb, sheet = "median_chg_overall_long", rows = 1:100, cols = 1:70, gridExpand = TRUE)
-  writeData(wb, sheet = "median_chg_overall_long", median.chg.overall.long, colNames = TRUE)
+  # deleteData(wb, sheet = "median_chg_overall_long", rows = 1:100, cols = 1:70, gridExpand = TRUE)
+  # writeData(wb, sheet = "median_chg_overall_long", median.chg.overall.long, colNames = TRUE)
 
-  deleteData(wb, sheet = "median_wholesale_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
-  writeData(wb, sheet = "median_wholesale_raw", median.wholesale, colNames = TRUE)
+  # deleteData(wb, sheet = "median_wholesale_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
+  # writeData(wb, sheet = "median_wholesale_raw", median.wholesale, colNames = TRUE)
 
-  deleteData(wb, sheet = "max_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
-  writeData(wb, sheet = "max_raw", max, colNames = TRUE)
+  # deleteData(wb, sheet = "max_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
+  # writeData(wb, sheet = "max_raw", max, colNames = TRUE)
 
-  deleteData(wb, sheet = "max_raw_etb", rows = 1:100, cols = 1:50, gridExpand = TRUE)
-  writeData(wb, sheet = "max_raw_etb", max.etb, colNames = TRUE)
+  # deleteData(wb, sheet = "max_raw_etb", rows = 1:100, cols = 1:50, gridExpand = TRUE)
+  # writeData(wb, sheet = "max_raw_etb", max.etb, colNames = TRUE)
 
-  deleteData(wb, sheet = "min_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
-  writeData(wb, sheet = "min_raw", min, colNames = TRUE)
+  # deleteData(wb, sheet = "min_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
+  # writeData(wb, sheet = "min_raw", min, colNames = TRUE)
 
-  deleteData(wb, sheet = "min_raw_etb", rows = 1:100, cols = 1:50, gridExpand = TRUE)
-  writeData(wb, sheet = "min_raw_etb", min.etb, colNames = TRUE)
+  # deleteData(wb, sheet = "min_raw_etb", rows = 1:100, cols = 1:50, gridExpand = TRUE)
+  # writeData(wb, sheet = "min_raw_etb", min.etb, colNames = TRUE)
 
   deleteData(wb, sheet = "all_prices", rows = 1:2000, cols = 1:100, gridExpand = TRUE)
   writeData(wb, sheet = "all_prices", all_prices, colNames = TRUE)
@@ -2010,21 +2010,20 @@
   deleteData(wb, sheet = "expectation_price", rows = 1:100, cols = 1:50, gridExpand = TRUE)
   writeData(wb, sheet = "expectation_price", expectation.price, colNames = TRUE, keepNA = FALSE)
 
-  deleteData(wb, sheet = "border_raw", rows = 1:10, cols = 1:100, gridExpand = TRUE)
-  writeData(wb, sheet = "border_raw", border, colNames = TRUE)
+  # deleteData(wb, sheet = "border_raw", rows = 1:10, cols = 1:100, gridExpand = TRUE)
+  # writeData(wb, sheet = "border_raw", border, colNames = TRUE)
 
-  deleteData(wb, sheet = "road_raw", rows = 1:10, cols = 1:200, gridExpand = TRUE)
-  writeData(wb, sheet = "road_raw", road, colNames = TRUE)
+  # deleteData(wb, sheet = "road_raw", rows = 1:10, cols = 1:200, gridExpand = TRUE)
+  # writeData(wb, sheet = "road_raw", road, colNames = TRUE)
 
-  deleteData(wb, sheet = "stock_level_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
-
-  writeData(wb, sheet = "stock_level_raw", stock_level, colNames = TRUE)
+  # deleteData(wb, sheet = "stock_level_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
+  # writeData(wb, sheet = "stock_level_raw", stock_level, colNames = TRUE)
 
   deleteData(wb, sheet = "restock_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
   writeData(wb, sheet = "restock_raw", restock, colNames = TRUE)
 
-  deleteData(wb, sheet = "restocked_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
-  writeData(wb, sheet = "restocked_raw", restocked, colNames = TRUE)
+  # deleteData(wb, sheet = "restocked_raw", rows = 1:100, cols = 1:50, gridExpand = TRUE)
+  # writeData(wb, sheet = "restocked_raw", restocked, colNames = TRUE)
 
   deleteData(wb, sheet = "restock_duration", rows = 1:100, cols = 1:10, gridExpand = TRUE)
   writeData(wb, sheet = "restock_duration", restock_duration, colNames = TRUE)
@@ -2032,14 +2031,14 @@
   deleteData(wb, sheet = "supply", rows = 1:100, cols = 1:50, gridExpand = TRUE)
   writeData(wb, sheet = "supply", supply, colNames = TRUE)
 
-  deleteData(wb, sheet = "all_supply", rows = 1:2000, cols = 1:50, gridExpand = TRUE)
-  writeData(wb, sheet = "all_supply", all_supply, colNames = TRUE)
+  # deleteData(wb, sheet = "all_supply", rows = 1:2000, cols = 1:50, gridExpand = TRUE)
+  # writeData(wb, sheet = "all_supply", all_supply, colNames = TRUE)
 
   deleteData(wb, sheet = "all_stocks", rows = 1:2000, cols = 1:50, gridExpand = TRUE)
   writeData(wb, sheet = "all_stocks", all_stocks, colNames = TRUE)
 
-  deleteData(wb, sheet = "all_roads", rows = 1:2000, cols = 1:200, gridExpand = TRUE)
-  writeData(wb, sheet = "all_roads", all_roads, colNames = TRUE)
+  # deleteData(wb, sheet = "all_roads", rows = 1:2000, cols = 1:200, gridExpand = TRUE)
+  # writeData(wb, sheet = "all_roads", all_roads, colNames = TRUE)
 
   deleteData(wb, sheet = "feedback_raw", rows = 1:100, cols = 1:100, gridExpand = TRUE)
   writeData(wb, sheet = "feedback_raw", feedback.export, colNames = TRUE)
@@ -2080,20 +2079,20 @@
   deleteData(wb, sheet = "local_trade", rows = 1:1000, cols = 1:1000, gridExpand = TRUE)
   writeData(wb, sheet = "local_trade", locally_supplied_trade, colNames = TRUE, rowNames = FALSE)
 
-  deleteData(wb, sheet = "wholesale_volume", rows = 1:100, cols = 1:100, gridExpand = TRUE)
-  writeData(wb, sheet = "wholesale_volume", trade_volume_wholesale, colNames = TRUE, rowNames = FALSE)
+  # deleteData(wb, sheet = "wholesale_volume", rows = 1:100, cols = 1:100, gridExpand = TRUE)
+  # writeData(wb, sheet = "wholesale_volume", trade_volume_wholesale, colNames = TRUE, rowNames = FALSE)
 
   # Save the analysis workbook:
   # Mohammad Azemi: Due to applying minimal changes to the original code above, I have just commented the saveWorkbook(),
   # Definitely the next code developer need to remove un-necessary parts
-  saveWorkbook(wb, "JMMI_analysis_01.xlsx", overwrite = T)
+  # saveWorkbook(wb, "JMMI_analysis_01.xlsx", overwrite = T)
 
   unique_location_org <- jmmi.raw %>%
     select(state, county, location, org) %>%
     arrange(state, county, location)
 
   unique_location_org <- unique(unique_location_org)
-} # end of batch original SSD code
+
 
 # updated code #############################################################################
 ############################################################################################
@@ -2108,11 +2107,11 @@
   shapefile <- st_read("./data/shapefile/ssd_states.shp")
   borders.geo.info <- read.xlsx("./data/border_geo_info.xlsx")
   result.file.path <- "new_result.xlsx"
-  template.file.path <- "./empty_template.xlsx"
+  # template.file.path <- "./empty_template.xlsx"
   options("openxlsx.borderColour" = "#303030")
   options("openxlsx.borderStyle" = "thin")
-  wb2 <- loadWorkbook(template.file.path)
-  modifyBaseFont(wb2, fontSize = 10, fontColour = "#303030")
+  # wb <- loadWorkbook(template.file.path)
+  modifyBaseFont(wb, fontSize = 10, fontColour = "#303030")
   
   location.headers <- c("state", "county", "location")
   location.headers.capital <- c("State", "County", "Location")
@@ -2302,7 +2301,7 @@
 
   max.tmp2 <- max %>%
     ungroup() %>%
-    select(-c("state", "county", "location"))
+    select(-location.headers)
 
   min.max <- cbind(min, max.tmp2)
   colnames(min.max) <- c(location.headers, new_col_names)
@@ -2347,22 +2346,16 @@
 
   set_median_header <- function(sheet_name) {
     if (sheet_name == "median") {
-      writeData(wb2, sheet_name, x = "State", startCol = 1, startRow = 1)
-      writeData(wb2, sheet_name, x = "County", startCol = 2, startRow = 1)
-      writeData(wb2, sheet_name, x = "Location", startCol = 3, startRow = 1)
-      writeData(wb2, sheet_name, x = "MEDIAN", startCol = 3, startRow = 2)
-      writeData(wb2, sheet_name, x = "Six Months change", startCol = 3, startRow = 3)
-      writeData(wb2, sheet_name, x = "Monthly change", startCol = 3, startRow = 4)
+      writeData(wb, sheet_name, x = "MEDIAN", startCol = 3, startRow = 2)
+      writeData(wb, sheet_name, x = "Six Months change", startCol = 3, startRow = 3)
+      writeData(wb, sheet_name, x = "Monthly change", startCol = 3, startRow = 4)
     } else if (sheet_name == "median USD") {
-      writeData(wb2, sheet_name, x = "State", startCol = 1, startRow = 1)
-      writeData(wb2, sheet_name, x = "County", startCol = 2, startRow = 1)
-      writeData(wb2, sheet_name, x = "Location", startCol = 3, startRow = 1)
-      writeData(wb2, sheet_name, x = "MEDIAN", startCol = 3, startRow = 2)
+      writeData(wb, sheet_name, x = "MEDIAN", startCol = 3, startRow = 2)
     }
   }
 
   # column order adjustment based on the excel template:
-  base.median.col.order <- c(
+  base.median.col.order <- c(location.headers.capital,
     "Sorghum.grain", "Maize.grain",
     "Wheat.flour", "Rice", "Groundnuts", "Beans", "Sugar",
     "Salt", "Cooking.oil", "Soap", "Jerrycan", "Mosquito.net",
@@ -2376,35 +2369,29 @@
     "Bamboo", "Grass", "Underwear", "School.bag", "Bra"
   )
   
-  columns_to_keep <- intersect(names(median2), base.median.col.order)
-  median2 <- median2[, columns_to_keep]
-
-  columns_to_keep <- intersect(names(median.overall), base.median.col.order)
+  columns_to_keep <- intersect(base.median.col.order, names(median.overall))
   median.overall <- median.overall[, columns_to_keep]
   
-  columns_to_keep <- intersect(names(median.change), base.median.col.order)
+  columns_to_keep <- intersect(base.median.col.order, names(median.change))
   median.change <- median.change[, columns_to_keep]
   
-  columns_to_keep <- intersect(names(median2), base.median.col.order)
+  columns_to_keep <- intersect(base.median.col.order, names(median2))
   median2 <- median2[, columns_to_keep]
   
-  columns_to_keep <- intersect(names(median2), base.median.col.order)
-  median2 <- median2[, columns_to_keep]
-
-  columns_to_keep <- intersect(names(median.usd.overall), base.median.col.order)
+  columns_to_keep <- intersect(base.median.col.order, names(median.usd.overall))
   median.usd.overall <- median.usd.overall[, columns_to_keep]
   
-  columns_to_keep <- intersect(names(median.usd), base.median.col.order)
+  columns_to_keep <- intersect(base.median.col.order, names(median.usd))
   median.usd <- median.usd[, columns_to_keep]
   
-  writeData(wb2, "median", t(base.median.col.order), colNames = FALSE, startRow = 1, startCol = 4)
-  writeData(wb2, "median", median.overall, colNames = FALSE, startRow = 2, startCol = 4)
-  writeData(wb2, "median", median.change, colNames = FALSE, startRow = 3, startCol = 4)
-  writeData(wb2, "median", median2, colNames = FALSE, startRow = 5)
+  writeData(wb, "median", t(base.median.col.order), colNames = FALSE, startRow = 1, startCol = 1)
+  writeData(wb, "median", median.overall, colNames = FALSE, startRow = 2, startCol = 4)
+  writeData(wb, "median", median.change, colNames = FALSE, startRow = 3, startCol = 4)
+  writeData(wb, "median", median2, colNames = FALSE, startRow = 5)
   
-  writeData(wb2, "median USD", t(usd_columns), colNames = FALSE, startRow = 1, startCol = 1)
-  writeData(wb2, "median USD", median.usd.overall, colNames = FALSE, startRow = 2, startCol = 4)
-  writeData(wb2, "median USD", median.usd, colNames = FALSE, startRow = 3)
+  writeData(wb, "median USD", t(columns_to_keep), colNames = FALSE, startRow = 1, startCol = 1)
+  writeData(wb, "median USD", median.usd.overall, colNames = FALSE, startRow = 2, startCol = 4)
+  writeData(wb, "median USD", median.usd, colNames = FALSE, startRow = 3)
 
   set_median_header("median")
   set_median_header("median USD")
@@ -2412,14 +2399,14 @@
   item_col_names_full <- vector()
   item_col_names_full <- rep(item_col_names, each = 3)
 
-  writeData(wb2, "minmax", t(item_col_names_full), colNames = FALSE, startRow = 1, startCol = 4)
+  writeData(wb, "minmax", t(item_col_names_full), colNames = FALSE, startRow = 1, startCol = 4)
 
   # Merge every three cells
   for (i in seq(4, length(item_col_names_full) + 1, by = 3)) {
-    mergeCells(wb2, sheet = "minmax", cols = i:(i + 2), rows = 1)
+    mergeCells(wb, sheet = "minmax", cols = i:(i + 2), rows = 1)
   }
 
-  writeData(wb2, "minmax", min.max, colNames = TRUE, startRow = 2, startCol = 1)
+  writeData(wb, "minmax", min.max, colNames = TRUE, startRow = 2, startCol = 1)
 
 
   # median wholesale sheet
@@ -2447,10 +2434,10 @@
     "Mark up"
   )
 
-  writeData(wb2, "median wholesale", t(location.headers), colNames = FALSE, startRow = 1, startCol = 1)
-  writeData(wb2, "median wholesale", headers3, colNames = FALSE, startRow = 2, startCol = 3)
-  writeData(wb2, "median wholesale", median.wholesale.overall2, colNames = TRUE, startRow = 1, startCol = 4)
-  writeData(wb2, "median wholesale", median.wholesale, colNames = FALSE, startRow = 5, startCol = 1)
+  writeData(wb, "median_wholesale", t(location.headers), colNames = FALSE, startRow = 1, startCol = 1)
+  writeData(wb, "median_wholesale", headers3, colNames = FALSE, startRow = 2, startCol = 3)
+  writeData(wb, "median_wholesale", median.wholesale.overall2, colNames = TRUE, startRow = 1, startCol = 4)
+  writeData(wb, "median_wholesale", median.wholesale, colNames = FALSE, startRow = 5, startCol = 1)
 
   # road sheet
   road.header <- c(
@@ -2473,7 +2460,7 @@
     )
   )
 
-  writeData(wb2, "road", road2, colNames = TRUE, startRow = 1, startCol = 1)
+  writeData(wb, "road", road2, colNames = TRUE, startRow = 1, startCol = 1)
 
   # border sheet
   border2 <- NA
@@ -2515,7 +2502,7 @@
   ggsave("border_map.png", plot = borders_plot)
   border2 <- border2 %>% select(-c(Latitude, Longitude))
 
-  writeData(wb2, "border", border2, colNames = TRUE, startRow = 1, startCol = 1)
+  writeData(wb, "border", border2, colNames = TRUE, startRow = 1, startCol = 1)
 
   # median etb
   median.etb.overall <- data.frame()
@@ -2557,12 +2544,12 @@
   median.etb.full <- bind_rows(median.etb.overall, median.etb)
   median.etb.full <- median.etb.full[, names(median.etb)]
 
-  writeData(wb2, "median ETB", median.etb.full, colNames = TRUE, startRow = 1, startCol = 1)
-  writeData(wb2, "median ETB", "overal median", colNames = FALSE, startRow = 2, startCol = 3)
+  writeData(wb, "median ETB", median.etb.full, colNames = TRUE, startRow = 1, startCol = 1)
+  writeData(wb, "median ETB", "overal median", colNames = FALSE, startRow = 2, startCol = 3)
 
   # stock_level sheet:
   stock_level_rounded <- stock_level %>% mutate_if(is.numeric, round)
-  writeData(wb2, "stock_level", stock_level_rounded, colNames = TRUE, startRow = 1, startCol = 1)
+  writeData(wb, "stock_level", stock_level_rounded, colNames = TRUE, startRow = 1, startCol = 1)
 
   # feedback_availability sheet:
   feedback.items.headers <- c(
@@ -2611,9 +2598,9 @@
 
   names(feedback.availability_updated) <- gsub(remove_values, "", names(feedback.availability_updated))
 
-  writeData(wb2, "feedback_availability", t(location.headers), colNames = FALSE, startRow = 2, startCol = 1)
-  writeData(wb2, "feedback_availability", t(feedback.items.headers), colNames = FALSE, startRow = 2, startCol = 4)
-  writeData(wb2, "feedback_availability", feedback.availability_updated, colNames = FALSE, startRow = 3, startCol = 1)
+  writeData(wb, "feedback_availability", t(location.headers), colNames = FALSE, startRow = 2, startCol = 1)
+  writeData(wb, "feedback_availability", t(feedback.items.headers), colNames = FALSE, startRow = 2, startCol = 4)
+  writeData(wb, "feedback_availability", feedback.availability_updated, colNames = FALSE, startRow = 3, startCol = 1)
 
   # min-max etb sheet:
   min.tmp.etb <- min.etb
@@ -2678,14 +2665,14 @@
   item_col_names_full.etb <- vector()
   item_col_names_full.etb <- rep(item_col_names.etb, each = 3)
 
-  writeData(wb2, "minmax_etb", t(item_col_names_full.etb), colNames = FALSE, startRow = 1, startCol = 4)
+  writeData(wb, "minmax_etb", t(item_col_names_full.etb), colNames = FALSE, startRow = 1, startCol = 4)
 
   # Merge every three cells
   for (i in seq(4, length(item_col_names_full.etb) + 1, by = 3)) {
-    mergeCells(wb2, sheet = "minmax_etb", cols = i:(i + 2), rows = 1)
+    mergeCells(wb, sheet = "minmax_etb", cols = i:(i + 2), rows = 1)
   }
 
-  writeData(wb2, "minmax_etb", min.max.etb, colNames = TRUE, startRow = 2, startCol = 1)
+  writeData(wb, "minmax_etb", min.max.etb, colNames = TRUE, startRow = 2, startCol = 1)
 
   # table items:
   get_first_row_value <- function(df, col_name) {
@@ -2832,11 +2819,11 @@
     ))
   }
 
-  writeData(wb2, "Table - Items", food.data[, -1], colNames = FALSE, startRow = 4, startCol = 4)
-  writeData(wb2, "Table - Items", non.food.data[, -1], colNames = FALSE, startRow = 15, startCol = 4)
-  writeData(wb2, "Table - Items", livestock.data[, -1], colNames = FALSE, startRow = 41, startCol = 4)
-  writeData(wb2, "Table - Items", service.data[, -1], colNames = FALSE, startRow = 44, startCol = 4)
-  writeData(wb2, "Table - Items", currencies.data[, -1], colNames = FALSE, startRow = 46, startCol = 4)
+  writeData(wb, "Table - Items", food.data[, -1], colNames = FALSE, startRow = 4, startCol = 4)
+  writeData(wb, "Table - Items", non.food.data[, -1], colNames = FALSE, startRow = 15, startCol = 4)
+  writeData(wb, "Table - Items", livestock.data[, -1], colNames = FALSE, startRow = 41, startCol = 4)
+  writeData(wb, "Table - Items", service.data[, -1], colNames = FALSE, startRow = 44, startCol = 4)
+  writeData(wb, "Table - Items", currencies.data[, -1], colNames = FALSE, startRow = 46, startCol = 4)
 
   # Table - MSSMEB sheet:
   # 1) overall MSSMEB:
@@ -2909,13 +2896,13 @@
     result.mssmeb <- rbind(result.mssmeb, state_rows)
   }
   
-  writeData(wb2, "Table - MSSMEB", median.mssmeb.overall.full, colNames = FALSE, startRow = 2, startCol = 4)
-  writeData(wb2, "Table - MSSMEB", median.mssmeb.full, colNames = FALSE, startRow = 3, startCol = 1)
-  writeData(wb2, "Table - MSSMEB", result.mssmeb, colNames = FALSE, startRow = 2, startCol = 9)
+  writeData(wb, "Table - MSSMEB", median.mssmeb.overall.full, colNames = FALSE, startRow = 2, startCol = 4)
+  writeData(wb, "Table - MSSMEB", median.mssmeb.full, colNames = FALSE, startRow = 3, startCol = 1)
+  writeData(wb, "Table - MSSMEB", result.mssmeb, colNames = FALSE, startRow = 2, startCol = 9)
   
   state_rows <- state_rows_fun(median.mssmeb.full$State)
   for (i in state_rows) {
-    addStyle(wb2, sheet = "Table - MSSMEB", style = seperator_style, rows = i, cols = 9:14)
+    addStyle(wb, sheet = "Table - MSSMEB", style = seperator_style, rows = i, cols = 9:14)
   }
   
   # Table indices sheet:
@@ -2993,13 +2980,13 @@
     result.ind <- rbind(result.ind, state_rows)
   }
 
-  writeData(wb2, "Table - Indices", median.ind.overall.full, colNames = FALSE, startRow = 2, startCol = 4)
-  writeData(wb2, "Table - Indices", median.ind.full, colNames = FALSE, startRow = 3, startCol = 1)
-  writeData(wb2, "Table - Indices", result.ind, colNames = FALSE, startRow = 2, startCol = 12)
+  writeData(wb, "Table - Indices", median.ind.overall.full, colNames = FALSE, startRow = 2, startCol = 4)
+  writeData(wb, "Table - Indices", median.ind.full, colNames = FALSE, startRow = 3, startCol = 1)
+  writeData(wb, "Table - Indices", result.ind, colNames = FALSE, startRow = 2, startCol = 11)
   
   state_rows <- state_rows_fun(median.ind.full$State)
   for (i in state_rows) {
-    addStyle(wb2, sheet = "Table - Indices", style = seperator_style, rows = i, cols = 11:18)
+    addStyle(wb, sheet = "Table - Indices", style = seperator_style, rows = i, cols = 11:18)
   }
   
 # Table median all sheet:
@@ -3121,15 +3108,15 @@ result.table$`Water (1 L)` <- NA
 result.table <- result.table %>%
   relocate(`Water (1 L)`, .after = Cooking.oil)
 
-writeData(wb2, "Table - Median all", median.table.overall[, 1:which(names(median.table.overall) == "Plastic.sheet")], colNames = FALSE, startRow = 2, startCol = 4)
-writeData(wb2, "Table - Median all", median.table.overall[, (which(names(median.table.overall) == "Pole") + 1):ncol(median.table.overall)], colNames = FALSE, startRow = 2, startCol = 21)
-writeData(wb2, "Table - Median all", median.table[, 1:which(names(median.table) == "Plastic.sheet")], colNames = FALSE, startRow = 3, startCol = 1)
-writeData(wb2, "Table - Median all", median.table[, (which(names(median.table) == "Plastic.sheet") + 1):ncol(median.table)], colNames = FALSE, startRow = 3, startCol = 21)
-writeData(wb2, "Table - Median all", result.table, colNames = FALSE, startRow = 2, startCol = 43)
+writeData(wb, "Table - Median all", median.table.overall[, 1:which(names(median.table.overall) == "Plastic.sheet")], colNames = FALSE, startRow = 2, startCol = 4)
+writeData(wb, "Table - Median all", median.table.overall[, (which(names(median.table.overall) == "Pole") + 1):ncol(median.table.overall)], colNames = FALSE, startRow = 2, startCol = 21)
+writeData(wb, "Table - Median all", median.table[, 1:which(names(median.table) == "Plastic.sheet")], colNames = FALSE, startRow = 3, startCol = 1)
+writeData(wb, "Table - Median all", median.table[, (which(names(median.table) == "Plastic.sheet") + 1):ncol(median.table)], colNames = FALSE, startRow = 3, startCol = 21)
+writeData(wb, "Table - Median all", result.table, colNames = FALSE, startRow = 2, startCol = 43)
 
 state_rows <- state_rows_fun(median.table$State)
 for (i in state_rows) {
-  addStyle(wb2, sheet = "Table - Median all", style = seperator_style, rows = i, cols = 43:67)
+  addStyle(wb, sheet = "Table - Median all", style = seperator_style, rows = i, cols = 43:67)
 }
 
 # Table - Stocks sheet:
@@ -3259,15 +3246,15 @@ for (st in unique(stock.table.small$state)) {
   result.stock <- rbind(result.stock, state_rows)
 }
 
-writeData(wb2, "Table - Stock", stock.table[, 1:which(names(stock.table) == "plastic_sheet_stock_current")],
+writeData(wb, "Table - Stock", stock.table[, 1:which(names(stock.table) == "plastic_sheet_stock_current")],
           colNames = FALSE, startRow = 2, startCol = 1)
-writeData(wb2, "Table - Stock", stock.table[, (which(names(stock.table) == "plastic_sheet_stock_current") + 1):ncol(stock.table)],
+writeData(wb, "Table - Stock", stock.table[, (which(names(stock.table) == "plastic_sheet_stock_current") + 1):ncol(stock.table)],
           colNames = FALSE, startRow = 2, startCol = 21)
-writeData(wb2, "Table - Stock", result.stock, colNames = FALSE, startRow = 2, startCol = 39)
+writeData(wb, "Table - Stock", result.stock, colNames = FALSE, startRow = 2, startCol = 39)
 
 state_rows <- state_rows_fun(stock.table.small$state)
 for (i in state_rows) {
-  addStyle(wb2, sheet = "Table - Stock", style = seperator_style, rows = i, cols = 39:59)
+  addStyle(wb, sheet = "Table - Stock", style = seperator_style, rows = i, cols = 39:59)
 }
 
 
@@ -3318,10 +3305,10 @@ plot_data <- bind_rows(
   plot_data.adeed5
 )
 
-writeData(wb2, "boxplot", plot_data, colNames = FALSE, startRow = 2, startCol = 2)
+writeData(wb, "boxplot", plot_data, colNames = FALSE, startRow = 2, startCol = 2)
 
 } # end of batch1
 
 
-saveWorkbook(wb2, result.file.path, overwrite = TRUE)
+saveWorkbook(wb, result.file.path, overwrite = TRUE)
 
