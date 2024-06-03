@@ -1899,7 +1899,15 @@
   # Load the analysis workbook:
 
   # wb <- loadWorkbook("JMMI_analysis.xlsx")
+
+  # This is a new template
+  # Some of the un-necessary sheets are commented. 
   wb <- loadWorkbook("./JMMI_template.xlsx")
+  options("openxlsx.borderColour" = "#303030")
+  options("openxlsx.borderStyle" = "thin")
+  # options("openxlsx.tabColour" = "blue")
+  
+  modifyBaseFont(wb, fontSize = 10, fontColour = "#303030")
   
   # Remove all the filters in the analysis worksheet to prevent it from corrupting.
   removeFilter(wb, "dashboard")
@@ -1918,9 +1926,9 @@
   removeFilter(wb, "boxplot")
   removeFilter(wb, "supply")
   # removeFilter(wb, "all_supply")
-  removeFilter(wb, "road")
+  # removeFilter(wb, "road")
   # removeFilter(wb, "all_roads")``
-  removeFilter(wb, "border")
+  # removeFilter(wb, "border")
   removeFilter(wb, "stock_level")
   removeFilter(wb, "restock_raw")
   # removeFilter(wb, "restocked_raw")
@@ -1943,15 +1951,15 @@
   # removeFilter(wb, "border_raw")
   # removeFilter(wb, "road_raw")
   removeFilter(wb, "restock_constraints")
-  removeFilter(wb, "modalities")
-  removeFilter(wb, "transport")
-  removeFilter(wb, "expectations")
+  # removeFilter(wb, "modalities")
+  # removeFilter(wb, "transport")
+  # removeFilter(wb, "expectations")  # merged with expectation_price sheet
   removeFilter(wb, "quote_check")
   removeFilter(wb, "insecurity_market")
   removeFilter(wb, "denomination")
-  removeFilter(wb, "mobile_money_no")
-  removeFilter(wb, "nfi_trade")
-  removeFilter(wb, "local_trade")
+  # removeFilter(wb, "mobile_money_no")
+  # removeFilter(wb, "nfi_trade")
+  # removeFilter(wb, "local_trade")
   # removeFilter(wb, "wholesale_volume")
 
   # For each dataframe, delete the existing data (1st line) and then save the new data (2nd line):
@@ -2009,6 +2017,7 @@
 
   deleteData(wb, sheet = "expectation_price", rows = 1:100, cols = 1:50, gridExpand = TRUE)
   writeData(wb, sheet = "expectation_price", expectation.price, colNames = TRUE, keepNA = FALSE)
+  writeData(wb, sheet = "expectation_price", price_expectations, colNames = TRUE, rowNames = TRUE, startRow = 1, startCol = 8) # merged data 
 
   # deleteData(wb, sheet = "border_raw", rows = 1:10, cols = 1:100, gridExpand = TRUE)
   # writeData(wb, sheet = "border_raw", border, colNames = TRUE)
@@ -2052,14 +2061,18 @@
   deleteData(wb, sheet = "restock_constraints", rows = 1:100, cols = 1:100, gridExpand = TRUE)
   writeData(wb, sheet = "restock_constraints", restock_constraints_df_2, colNames = TRUE, rowNames = TRUE)
 
-  deleteData(wb, sheet = "modalities", rows = 1:100, cols = 1:100, gridExpand = TRUE)
-  writeData(wb, sheet = "modalities", payment_modalities_df_2, colNames = TRUE, rowNames = TRUE)
-
-  deleteData(wb, sheet = "transport", rows = 1:100, cols = 1:100, gridExpand = TRUE)
-  writeData(wb, sheet = "transport", transport_matrix, colNames = TRUE, rowNames = TRUE)
-
-  deleteData(wb, sheet = "expectations", rows = 1:100, cols = 1:100, gridExpand = TRUE)
-  writeData(wb, sheet = "expectations", price_expectations, colNames = TRUE, rowNames = TRUE)
+  # deleteData(wb, sheet = "modalities", rows = 1:100, cols = 1:100, gridExpand = TRUE)
+  # writeData(wb, sheet = "modalities", payment_modalities_df_2, colNames = TRUE, rowNames = TRUE)
+  # 
+  # deleteData(wb, sheet = "transport", rows = 1:100, cols = 1:100, gridExpand = TRUE)
+  # writeData(wb, sheet = "transport", transport_matrix, colNames = TRUE, rowNames = TRUE)
+  
+  # two sheets (transport, modalities) were merged to "trade" sheet
+  writeData(wb, sheet = "transport_modalities", transport_matrix, colNames = TRUE, rowNames = TRUE)
+  writeData(wb, sheet = "transport_modalities", payment_modalities_df_2, colNames = TRUE, rowNames = TRUE, startCol = 5)
+  
+  # deleteData(wb, sheet = "expectations", rows = 1:100, cols = 1:100, gridExpand = TRUE)
+  # writeData(wb, sheet = "expectations", price_expectations, colNames = TRUE, rowNames = TRUE)
 
   deleteData(wb, sheet = "quote_check", rows = 1:100, cols = 1:100, gridExpand = TRUE)
   writeData(wb, sheet = "quote_check", quotation_check_unit, colNames = TRUE, rowNames = FALSE)
@@ -2070,20 +2083,26 @@
   deleteData(wb, sheet = "denomination", rows = 1:1000, cols = 1:1000, gridExpand = TRUE)
   writeData(wb, sheet = "denomination", ssp_denominations, colNames = TRUE, rowNames = FALSE)
 
-  deleteData(wb, sheet = "mobile_money_no", rows = 1:1000, cols = 1:1000, gridExpand = TRUE)
-  writeData(wb, sheet = "mobile_money_no", mobile_money_reason, colNames = TRUE, rowNames = FALSE)
-
-  deleteData(wb, sheet = "nfi_trade", rows = 1:1000, cols = 1:1000, gridExpand = TRUE)
-  writeData(wb, sheet = "nfi_trade", nfi_trade, colNames = TRUE, rowNames = FALSE)
-
-  deleteData(wb, sheet = "local_trade", rows = 1:1000, cols = 1:1000, gridExpand = TRUE)
-  writeData(wb, sheet = "local_trade", locally_supplied_trade, colNames = TRUE, rowNames = FALSE)
+  
+  # deleteData(wb, sheet = "mobile_money_no", rows = 1:1000, cols = 1:1000, gridExpand = TRUE)
+  # writeData(wb, sheet = "mobile_money_no", mobile_money_reason, colNames = TRUE, rowNames = FALSE)
+  # 
+  # deleteData(wb, sheet = "nfi_trade", rows = 1:1000, cols = 1:1000, gridExpand = TRUE)
+  # writeData(wb, sheet = "nfi_trade", nfi_trade, colNames = TRUE, rowNames = FALSE)
+  # 
+  # deleteData(wb, sheet = "local_trade", rows = 1:1000, cols = 1:1000, gridExpand = TRUE)
+  # writeData(wb, sheet = "local_trade", locally_supplied_trade, colNames = TRUE, rowNames = FALSE)
 
   # deleteData(wb, sheet = "wholesale_volume", rows = 1:100, cols = 1:100, gridExpand = TRUE)
   # writeData(wb, sheet = "wholesale_volume", trade_volume_wholesale, colNames = TRUE, rowNames = FALSE)
 
+  # three sheets (nfi_trade, local_trade, mobile_money_no) were merged to "trade" sheet
+  writeData(wb, sheet = "trade", nfi_trade, colNames = TRUE, rowNames = FALSE)
+  writeData(wb, sheet = "trade", locally_supplied_trade, colNames = TRUE, rowNames = FALSE, startCol = 9)
+  writeData(wb, sheet = "trade", mobile_money_reason, colNames = TRUE, rowNames = FALSE, startCol = 17)
+  
   # Save the analysis workbook:
-  # Mohammad Azemi: Due to applying minimal changes to the original code above, I have just commented the saveWorkbook(),
+  # Due to applying minimal changes to the original code above, I have just commented the saveWorkbook(),
   # Definitely the next code developer need to remove un-necessary parts
   # saveWorkbook(wb, "JMMI_analysis_01.xlsx", overwrite = T)
 
@@ -2093,11 +2112,9 @@
 
   unique_location_org <- unique(unique_location_org)
 
+# updated code for generating some necessary excel sheets ##########################
+###########################################################################################
 
-# updated code #############################################################################
-############################################################################################
-
-{
   library(rlang)
   library(purrr)
   library(tibble)
@@ -2107,11 +2124,6 @@
   shapefile <- st_read("./data/shapefile/ssd_states.shp")
   borders.geo.info <- read.xlsx("./data/border_geo_info.xlsx")
   result.file.path <- "new_result.xlsx"
-  # template.file.path <- "./empty_template.xlsx"
-  options("openxlsx.borderColour" = "#303030")
-  options("openxlsx.borderStyle" = "thin")
-  # wb <- loadWorkbook(template.file.path)
-  modifyBaseFont(wb, fontSize = 10, fontColour = "#303030")
   
   location.headers <- c("state", "county", "location")
   location.headers.capital <- c("State", "County", "Location")
@@ -2295,7 +2307,6 @@
   item_col_names <- min_col_names[!min_col_names %in% location.headers]
   min_col_names <- min_col_names[!min_col_names %in% location.headers]
   max_col_names <- max_col_names[!max_col_names %in% location.headers]
-
   min_col_names <- paste("min", min_col_names, sep = ".")
   new_col_names <- cbind(min_col_names, paste("max", max_col_names, sep = "."))
 
@@ -2398,7 +2409,7 @@
 
   item_col_names_full <- vector()
   item_col_names_full <- rep(item_col_names, each = 3)
-
+  
   writeData(wb, "minmax", t(item_col_names_full), colNames = FALSE, startRow = 1, startCol = 4)
 
   # Merge every three cells
@@ -2439,7 +2450,7 @@
   writeData(wb, "median_wholesale", median.wholesale.overall2, colNames = TRUE, startRow = 1, startCol = 4)
   writeData(wb, "median_wholesale", median.wholesale, colNames = FALSE, startRow = 5, startCol = 1)
 
-  # road sheet
+  # road_border sheet (road) 
   road.header <- c(
     "road",
     "trader",
@@ -2460,9 +2471,9 @@
     )
   )
 
-  writeData(wb, "road", road2, colNames = TRUE, startRow = 1, startCol = 1)
+  writeData(wb, "road_border", road2, colNames = TRUE, startRow = 1, startCol = 1)
 
-  # border sheet
+  # road_border sheet: (border) 
   border2 <- NA
   border.header <- c(
     "Border crossing",
@@ -2502,9 +2513,9 @@
   ggsave("border_map.png", plot = borders_plot)
   border2 <- border2 %>% select(-c(Latitude, Longitude))
 
-  writeData(wb, "border", border2, colNames = TRUE, startRow = 1, startCol = 1)
+  writeData(wb, "road_border", border2, colNames = TRUE, startRow = 1, startCol = 8)
 
-  # median etb
+  # median etb sheet:
   median.etb.overall <- data.frame()
   median.etb.overall <- jmmi %>%
     filter(currency %in% "ETB") %>%
@@ -3307,8 +3318,6 @@ plot_data <- bind_rows(
 
 writeData(wb, "boxplot", plot_data, colNames = FALSE, startRow = 2, startCol = 2)
 
-} # end of batch1
-
-
 saveWorkbook(wb, result.file.path, overwrite = TRUE)
+
 
