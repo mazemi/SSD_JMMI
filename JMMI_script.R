@@ -11,25 +11,23 @@
   # ///    THE FOLLOWING LINES NEED ADJUSTMENT EVERY MONTH:     ///
   # ///                                                         ///
   # ///    Define current month:                                ///
-  month_curr <- 03 # adjust value if needed!    ///
-  year_curr <- 2024 # "                          ///
+  month_curr  <- 04       # adjust value if needed!    ///
+  year_curr   <- 2024     # "                          ///
   # ///                                                         ///
   # ///    Define previous month:                               ///
-  month_prev <- 02 # adjust value if needed!     ///
-  year_prev <- 2024 # "                          ///
+  month_prev  <- 03       # adjust value if needed!     ///
+  year_prev   <- 2024    # "                          ///
   # ///                                                         ///
   # ///    Define month 3 months behind:                       ///
-  month_lag_3 <- 12 # adjust value if needed!     ///
-  year_lag_3 <- 2023
+  month_lag_3  <- 12       # adjust value if needed!     ///
+  year_lag_3   <- 2023 
   # ///    Define month for longterm changes:                   ///
-  month_long <- 03 # adjust value if needed!    ///
-  year_long <- 2023 # "                          ///
+  month_long  <- 04        # adjust value if needed!    ///
+  year_long   <- 2023     #                                      ///
   # ///                                                         ///
   # ///////////////////////////////////////////////////////////////
 
-
   # load packages:
-
   library(dplyr) # to restructure and aggregate the data
   library(openxlsx) # to read and export Excel files
   library(tidyr) # to tidy and format data
@@ -40,13 +38,13 @@
   library(ggplot2)
 
   # load all the data:
-  jmmi <- read.xlsx("./data/JMMI_data.xlsx", sheet = "CLEAN", colNames = TRUE)
-  write.csv(jmmi, "./data/1_import/JMMI_data.csv", na = "", row.names = FALSE)
-  jmmi <- read.csv("./data/1_import/JMMI_data.csv", stringsAsFactors = FALSE)
-  feedback <- read.xlsx("./data/JMMI_data.xlsx", sheet = "feedback", colNames = TRUE)
-  jmmi.raw <- read.xlsx("./data/1_import/raw.xlsx", sheet = 1, colNames = TRUE)
-  longterm <- read.csv("./data/6_longterm/JMMI_longterm_bylocation.csv", header = TRUE)
-  median.indices <- read.xlsx("./data/JMMI_analysis0.xlsx", sheet = "median", colNames = TRUE)
+  jmmi <- read.xlsx("./JMMI_data.xlsx", sheet = "CLEAN", colNames = TRUE)
+  write.csv(jmmi, "./1_import/JMMI_data.csv", na = "", row.names = FALSE)
+  jmmi <- read.csv("./1_import/JMMI_data.csv", stringsAsFactors = FALSE)
+  feedback <- read.xlsx("./JMMI_data.xlsx", sheet = "feedback", colNames = TRUE)
+  jmmi.raw <- read.xlsx("./1_import/raw.xlsx", sheet = 1, colNames = TRUE)
+  longterm <- read.csv("./6_longterm/JMMI_longterm_bylocation.csv", header = TRUE)
+  median.indices <- read.xlsx("./JMMI_analysis.xlsx", sheet = "median", colNames = TRUE)
 
   # the path of necessary files for producing border map image: 
   shapefile <- st_read("./data/shapefile/ssd_states.shp")
@@ -1453,7 +1451,6 @@
 
 
   # ============================================== Insecurity present within marketplace ==================================
-
   # this is used to note if there is any insecurity which will be used to inform the MFI
 
   insecurity_marketplace <- jmmi %>%
@@ -1467,8 +1464,6 @@
 
 
   # In this section, the changes over time are calculated.
-
-
   # First, we adjust the data we imported from the median tab in the ANALYSIS WORKSHEET. Delete all the rows that we don't need, and only keep the columns with indices.
 
 
@@ -1487,19 +1482,13 @@
     select(Year, Month, everything()) %>%
     mutate(across(everything() & -contains(c("State", "County", "Location")), as.numeric))
 
-
   # Delete current month's data from longterm dataset:
-
   longterm <- longterm %>% filter(!(Month == month_curr & Year == year_curr))
 
-
   # Join the data from the latest month with the longterm dataset to create an updated longterm dataframe:
-
   median.chg <- full_join(longterm, median.chg)
 
-
   # Filter out the months for which you want to calculate the changes (this is important to make sure the below aggregation function works correctly):
-
   median.chg.1m <- median.chg %>% filter(Month == month_prev & Year == year_prev | Month == month_curr & Year == year_curr)
 
   median.chg.1m <- median.chg.1m %>%
@@ -1909,7 +1898,7 @@
 # 
 # The idea is to reduce the number of sheets/tabs in the JMMI analysis.
 # The original file contains 79 tightly connected tabs.
-# I tried to trace their Excel formulas and recreated them using R.
+# I tried to trace the Excel formulas and recreated them using R.
 # However, some tabs still use Excel formulas in the output files.
 # 
 # To reduce the tabs, three approaches have been implemented:
@@ -1917,9 +1906,12 @@
 #   2) Merging small sheets.
 #   3) Splitting the file into two separate files.
 #   4) Hiding intermediate sheets that remain in the output files.
+#
+# result1 has 17 tabs
+# result2 has 6 tabs
 
-# ---- general headers: ----
 
+  # general headers:
   location.headers <- c("state", "county", "location")
   location.headers.capital <- c("State", "County", "Location")
   
@@ -1929,33 +1921,52 @@
     increments <- 1:length(first_occurrences)
     first_occurrences <- first_occurrences + increments
     return(first_occurrences)
-  }
+  }                               
   
-  # ---- median sheet: ---- 
-  median2 <- data.frame()
-  median2 <- median
-
-  median.col.order <- c(
+  # ---- median and median USD sheets: ---- 
+  # these are the column names fixed in the median sheet:
+  col.names.part1 <- c(
     "Sorghum.grain", "Maize.grain", "Wheat.flour", "Rice", "Groundnuts", "Beans", "Sugar", "Salt",
     "Cooking.oil", "Soap", "Jerrycan", "Mosquito.net", "Exercise.book", "Blanket", "Cooking.pot", "Plastic.sheet",
     "Pole", "Firewood", "Charcoal", "Goat", "Chicken", "Milling.costs", "Rubber.rope", "Kanga", "Solar.lamp",
-    "Plastic.bucket", "Sanitary.pad", "Pen", "Pencil", "Rubber", "Sharpener", "Sleeping.mat", "Bamboo",
-    "Underwear", "School.bag", "Bra", "Grass",
+    "Plastic.bucket", "Sanitary.pad", "Pen", "Pencil", "Rubber", "Sharpener", "Sleeping.mat", 
     "USD", "SDG", "ETB", "UGX", "KES", "CDF", "XAF"
   )
+  
+  col.names.part2 <- c(
+    "Food.price.index", "MSSMEB.food.basket",	"MSSMEB"
+  ) 
+ 
+  col.names.part3 <- c(
+    "Covid.price.index", "Cereal"
+  ) 
+  
+  col.names.part4 <- c(
+    "Bamboo", "Grass", "Underwear", "School.bag", "Bra"
+  ) 
+  
+  length(col.names.part1) + length(col.names.part2) + length(col.names.part3) + length(col.names.part4)
 
-  median.col.indexs <- c(
-    "Food.price.index", "MSSMEB.food.basket", "MSSMEB"
-  )
-
-  median.col.extra <- c("Covid.price.index", "Cereal")
-  median.df <- data.frame()
+  median2 <- data.frame()
+  median2 <- median
+  
+  median2 <- median2[, c(location.headers.capital, col.names.part1, col.names.part4)]
+  
   median.change <- rbind(median.chg.overall.long, median.chg.overall.1m)
   median.change <- median.change %>% select(-c("MSSMEB.food.basket.chg.USD", "MSSMEB.chg.USD"))
 
+  median.change$Covid.price.index <- NA
+  median.change$Cereal <- NA
+  
   colnames(median.change) <- gsub(".chg", "", colnames(median.change))
-  median.change <- median.change[, c(median.col.order, median.col.indexs)]
+  median.change <- median.change[, c(
+    col.names.part1,
+    col.names.part2,
+    col.names.part3,
+    col.names.part4
+  )]
 
+  # a function that return a default value which is the overall median value in our case
   get_default_value <- function(df, column_name) {
     default_value <- df[[column_name]][1]
     return(default_value)
@@ -1972,10 +1983,8 @@
       grinding_costs_ssp,
       usd_price_ind, sdg_price_ind, etb_price_ind, ugx_price_ind, kes_price_ind, cdf_price_ind, xaf_price_ind,
       rubber_rope_price_unit_ssp, kanga_price_unit_ssp, solar_lamp_price_unit_ssp,
-      # aqua_tab_price_unit_ssp,
       plastic_bucket_price_unit_ssp, sanitary_pads_price_unit_ssp, pen_price_unit_ssp, pencil_price_unit_ssp, rubber_price_unit_ssp, sharpener_price_unit_ssp,
       sleeping_mat_price_unit_ssp, bamboo_price_unit_ssp, underwear_price_unit_ssp, school_bag_price_unit_ssp, bra_price_unit_ssp, grass_price_unit_ssp
-      # water_price_unit_ssp
     ) %>%
     summarise(across(everything(), ~ median(., na.rm = TRUE)))
   
@@ -1990,16 +1999,12 @@
       Chicken = chicken_price_unit_ssp, "Milling.costs" = grinding_costs_ssp, "USD" = usd_price_ind, "SDG" = sdg_price_ind,
       ETB = etb_price_ind, UGX = ugx_price_ind, KES = kes_price_ind, CDF = cdf_price_ind, XAF = xaf_price_ind,
       "Rubber.rope" = rubber_rope_price_unit_ssp, "Kanga" = kanga_price_unit_ssp, "Solar.lamp" = solar_lamp_price_unit_ssp,
-      # "Aqua.tab" = aqua_tab_price_unit_ssp,
       "Plastic.bucket" = plastic_bucket_price_unit_ssp,
       "Sanitary.pad" = sanitary_pads_price_unit_ssp, "Pen" = pen_price_unit_ssp, "Pencil" = pencil_price_unit_ssp, "Rubber" = rubber_price_unit_ssp, "Sharpener" = sharpener_price_unit_ssp,
       "Sleeping.mat" = sleeping_mat_price_unit_ssp, "Bamboo" = bamboo_price_unit_ssp, "Underwear" = underwear_price_unit_ssp, "School.bag" = school_bag_price_unit_ssp, "Bra" = bra_price_unit_ssp,
       "Grass" = grass_price_unit_ssp
-      # "Water" =  water_price_unit_ssp
     )
   
-  median.overall <- median.overall %>% select(all_of(median.col.order))
-    
   median2 <- median2 %>%
     rowwise() %>%
     mutate(
@@ -2045,15 +2050,23 @@
       )
     )
 
-  median2 <- median2 %>% select(-Cereal, everything(), Cereal)
+
   median_Food_price_index <- median(median2$Food.price.index, na.rm = TRUE)
   median_MSSMEB_food_basket <- median(median2$MSSMEB.food.basket, na.rm = TRUE)
   median_MSSMEB <- median(median2$MSSMEB, na.rm = TRUE)
   median.overall$Food.price.index <- median_Food_price_index
   median.overall$MSSMEB.food.basket <- median_MSSMEB_food_basket
   median.overall$MSSMEB <- median_MSSMEB
-
-  # ---- median USD sheet: ---- 
+  median.overall$Covid.price.index <- NA
+  median.overall$Cereal <- NA
+ 
+  # final column alignment:
+  median.overall <- median.overall[, c(col.names.part1, col.names.part2, col.names.part3, col.names.part4)]
+  median.change <- median.change[, c(col.names.part1, col.names.part2, col.names.part3, col.names.part4)]
+  median2 <- median2[, c(location.headers.capital, col.names.part1, col.names.part2, col.names.part3, col.names.part4)]
+  
+  
+  # usd info
   not.in.usd <- c(
     "SDG",
     "ETB",
@@ -2062,122 +2075,72 @@
     "CDF",
     "XAF",
     "Covid.price.index",
-    "Cereal"
+    "Cereal" 
   )
-  not.in.usd.overall <- c(
-    "SDG",
-    "ETB",
-    "UGX",
-    "KES",
-    "CDF",
-    "XAF"
-  )
+  
   median.usd <- data.frame()
-  median.usd <- median2 %>% select(-all_of(not.in.usd.overall))
+  median.usd <- median2 %>% select(-all_of(not.in.usd))
   median_usd_value <- median(median.usd$USD, na.rm = TRUE)
   median.usd$USD[is.na(median.usd$USD)] <- median_usd_value
   numeric_columns <- which(sapply(median.usd, is.numeric))
   median.usd[, numeric_columns] <- round(median.usd[, numeric_columns] / median.usd$USD, digits = 3)
   median.usd.overall <- data.frame()
-  median.usd.overall <- median.overall %>% select(-all_of(not.in.usd.overall))
+  median.usd.overall <- median.overall %>% select(-all_of(not.in.usd))
   numeric_columns_overall <- which(sapply(median.usd.overall, is.numeric))
   median.usd.overall[, numeric_columns_overall] <- round(median.usd.overall[, numeric_columns_overall] / median_usd_value, digits = 3)
-  median.usd <- median.usd %>% select(-Covid.price.index, -Cereal)
-  usd_columns <- colnames(median.usd)
-  median.usd.overall <- median.usd.overall[, intersect(names(median.usd), names(median.usd.overall))]
 
   # ---- min-max sheet: ---- 
+  # a function to replace Inf and -Inf with NA
+  replace_inf_with_na <- function(x) {
+    x[is.infinite(x)] <- NA
+    return(x)
+  }
+  
+  # a function to calculate the difference for each column
+  calc_diff <- function(min_col, max_col) {
+    round((max_col - min_col) / min_col, 2)
+  }
+  
   min.tmp <- min
   max.tmp <- max
-
+  
   colnames(min.tmp) <- gsub("_price_unit_ssp", "", colnames(min.tmp))
   colnames(max.tmp) <- gsub("_price_unit_ssp", "", colnames(max.tmp))
-
-  min_col_names <- colnames(min.tmp)
-  max_col_names <- colnames(max.tmp)
-  item_col_names <- min_col_names[!min_col_names %in% location.headers]
-  min_col_names <- min_col_names[!min_col_names %in% location.headers]
-  max_col_names <- max_col_names[!max_col_names %in% location.headers]
-  min_col_names <- paste("min", min_col_names, sep = ".")
-  new_col_names <- cbind(min_col_names, paste("max", max_col_names, sep = "."))
-
-  max.tmp2 <- max %>%
-    ungroup() %>%
-    select(-location.headers)
-
-  min.max <- cbind(min, max.tmp2)
-  colnames(min.max) <- c(location.headers, new_col_names)
-
-  for (col in names(min.max)) {
-    # Check if the column contains infinite values and replace them with ""
-    min.max[[col]][is.infinite(min.max[[col]])] <- NA_real_
-  }
-
-  for (i in 1:length(item_col_names)) {
-    min_col <- paste0("min.", item_col_names[i])
-    max_col <- paste0("max.", item_col_names[i])
-    min.max[[paste0("diff.", item_col_names[i])]] <- round((min.max[[max_col]] - min.max[[min_col]]) / min.max[[min_col]], 3)
-  }
-
-  new_column_order <- vector()
-
-  for (i in 1:length(item_col_names)) {
-    new_column_order <- c(new_column_order, paste0("min.", item_col_names[i]))
-    new_column_order <- c(new_column_order, paste0("max.", item_col_names[i]))
-    new_column_order <- c(new_column_order, paste0("diff.", item_col_names[i]))
-  }
-
-  # Reorder the data frame columns based on the new order
-  min.max <- min.max[, c(location.headers, new_column_order)]
-
-  new_col_names0 <- names(min.max)[4:ncol(min.max)]
-
-  # Iterate over the column names and add prefixes
-  for (col_name in new_col_names0) {
-    if (startsWith(col_name, "min.")) {
-      new_name <- "min"
-    } else if (startsWith(col_name, "max.")) {
-      new_name <- "max"
-    } else if (startsWith(col_name, "diff.")) {
-      new_name <- "diff"
-    }
-
-    # Rename the column
-    names(min.max)[which(names(min.max) == col_name)] <- new_name
-  }
   
-  # column order adjustment based on the excel template:
-  base.median.col.order <- c(location.headers.capital,
-    "Sorghum.grain", "Maize.grain",
-    "Wheat.flour", "Rice", "Groundnuts", "Beans", "Sugar",
-    "Salt", "Cooking.oil", "Soap", "Jerrycan", "Mosquito.net",
-    "Exercise.book", "Blanket", "Cooking.pot", "Plastic.sheet", "Pole",
-    "Firewood", "Charcoal", "Goat", "Chicken", "Milling.costs",
-    "USD", "SDG", "ETB", "UGX", "KES",
-    "CDF", "XAF", "Rubber.rope", "Kanga", "Solar.lamp",
-    "Plastic.bucket", "Sanitary.pad", "Pen", "Pencil", "Rubber",
-    "Sharpener", "Sleeping.mat", 
-    "Food.price.index", "MSSMEB.food.basket", "MSSMEB", "Covid.price.index", "Cereal",
-    "Bamboo", "Grass", "Underwear", "School.bag", "Bra"
+  # to make sure columns are aligned with the empty template file:
+  minmax.col.order <- c(
+    location.headers, "sorghum_grain", "maize_grain", "wheat_flour", "rice", "groundnuts",
+    "beans", "sugar", "salt", "cooking_oil", "soap", "jerrycan", "mosquito_net", "exercise_book",
+    "blanket", "cooking_pot", "plastic_sheet", "pole", "firewood", "charcoal", "goat", "chicken",
+    "grinding_costs_ssp", "rubber_rope", "kanga", "solar_lamp", "plastic_bucket", "sanitary_pads",
+    "pen", "pencil", "rubber", "sharpener", "sleeping_mat",
+    "usd_price_ind", "sdg_price_ind", "etb_price_ind", "ugx_price_ind", "kes_price_ind",
+    "cdf_price_ind", "xaf_price_ind",
+    "bamboo",  "grass", "underwear", "school_bag", "bra"
   )
   
-  columns_to_keep <- intersect(base.median.col.order, names(median.overall))
-  median.overall <- median.overall[, columns_to_keep]
+  min.tmp <- min.tmp[ , minmax.col.order]
+  max.tmp <- max.tmp[ , minmax.col.order]
   
-  columns_to_keep <- intersect(base.median.col.order, names(median.change))
-  median.change <- median.change[, columns_to_keep]
-  
-  columns_to_keep <- intersect(base.median.col.order, names(median2))
-  median2 <- median2[, columns_to_keep]
-  
-  columns_to_keep <- intersect(base.median.col.order, names(median.usd.overall))
-  median.usd.overall <- median.usd.overall[, columns_to_keep]
-  
-  columns_to_keep <- intersect(base.median.col.order, names(median.usd))
-  median.usd <- median.usd[, columns_to_keep]
+  min.tmp[] <- lapply(min.tmp, replace_inf_with_na)
+  max.tmp[] <- lapply(max.tmp, replace_inf_with_na)
 
-  item_col_names_full <- vector()
-  item_col_names_full <- rep(item_col_names, each = 3)
+  # improved approach:
+  merged_df <- merge(min.tmp, max.tmp, by = location.headers , suffixes = c(".min", ".max"))
+  
+  # Create the final data frame with min, max, and diff values
+  min.max <- data.frame()
+  min.max <- merged_df[location.headers]
+  
+  for (col in setdiff(names(min.tmp), location.headers)) {
+    min_col_name <- paste0(col, ".min")
+    max_col_name <- paste0(col, ".max")
+    diff_col_name <- paste0("diff.", col)
+    
+    min.max[[min_col_name]] <- merged_df[[min_col_name]]
+    min.max[[max_col_name]] <- merged_df[[max_col_name]]
+    min.max[[diff_col_name]] <- calc_diff(merged_df[[min_col_name]], merged_df[[max_col_name]])
+  }
   
   # ---- median wholesale sheet: ----  
   median.wholesale.overall <- jmmi %>%
@@ -2279,7 +2242,6 @@
       firewood_price_unit, charcoal_price_unit, goat_price_unit, chicken_price_unit, grinding_costs_sorghum_calc,
       usd_price_ind, sdg_price_ind, ugx_price_ind, kes_price_ind, cdf_price_ind, xaf_price_ind,
       rubber_rope_price_unit, kanga_price_unit, solar_lamp_price_unit,
-      # aqua_tab_price_unit,
       plastic_bucket_price_unit,
       sanitary_pads_price_unit, pen_price_unit, pencil_price_unit, rubber_price_unit, sharpener_price_unit,
       sleeping_mat_price_unit, bamboo_price_unit, underwear_price_unit, school_bag_price_unit, bra_price_unit, grass_price_unit
@@ -2296,7 +2258,6 @@
       "Chicken.etb" = chicken_price_unit, "Milling.costs.etb" = grinding_costs_sorghum_calc, "USD.etb" = usd_price_ind, "SDG.etb" = sdg_price_ind,
       "UGX.etb" = ugx_price_ind, "KES.etb" = kes_price_ind, "CDF.etb" = cdf_price_ind, "XAF.etb" = xaf_price_ind,
       "Rubber.rope.etb" = rubber_rope_price_unit, "Kanga.etb" = kanga_price_unit, "Solar.lamp.etb" = solar_lamp_price_unit,
-      # "Aqua.tab.etb" = aqua_tab_price_unit,
       "Plastic.bucket.etb" = plastic_bucket_price_unit,
       "Sanitary.pad.etb" = sanitary_pads_price_unit, "Pen.etb" = pen_price_unit, "Pencil.etb" = pencil_price_unit, "Rubber.etb" = rubber_price_unit, "Sharpener.etb" = sharpener_price_unit,
       "Sleeping.mat.etb" = sleeping_mat_price_unit, "Bamboo.etb" = bamboo_price_unit, "Underwear.etb" = underwear_price_unit, "School.bag.etb" = school_bag_price_unit, "Bra.etb" = bra_price_unit,
@@ -2308,55 +2269,7 @@
 
   # ---- stock_level sheet: ----
   stock_level_rounded <- stock_level %>% mutate_if(is.numeric, round)
-
-
-  # ---- feedback_availability sheet: ----
-  feedback.items.headers <- c(
-    "Sorghum grain", "Sorghum flour", "Maize grain", "Maize flour",
-    "Wheat flour", "Cassava flour", "Rice", "Millets",
-    "Groundnuts", "Beans", "Cowpea", "Lentils",
-    "Sesame", "Salt", "Sugar", "Cooking oil",
-    "Milk (powder)", "Fish (dried)", "Honey", "Potatoes",
-    "Okra", "Onions", "Tomatoes", "Banana",
-    "Mango", "Milk (fresh)", "Fish (fresh)", "Beef meat",
-    "Soap", "Jerrycan", "Bucket", "Bleach",
-    "Mosquito net", "Sanitary pad", "Exercise book", "Pen",
-    "Blanket", "Clothing", "Sandals / shoes", "Cooking pot",
-    "Cooking utensils", "Plastic sheet", "Iron sheet",
-    "Pole", "Soalr lamp", "Firewood", "Charcoal",
-    "Petrol", "Diesel", "Medicine", "Phone credit",
-    "Sleeping mat", "Bull", "Goat", "Sheep",
-    "Chicken", "Plumpy Nut (RUTF)", "Plumpy Sup (RUSF)", "CSB++",
-    "BP-5", "Sorghum grain", "Maize grain", "Wheat flour",
-    "Rice", "Groundnuts", "Beans", "Sugar",
-    "Salt", "Cooking oil", "Soap", "Jerrycan",
-    "Mosquito net", "Exercise book", "Blanket", "Cooking pot",
-    "Plastic sheet", "Pole", "Firewood", "Charcoal",
-    "Goat", "Chicken", "SSP", "USD",
-    "SDG", "ETB", "UGX", "KES",
-    "CDF", "XAF", "Sleeping mat", "sum"
-  )
   
-  feedback.availability_updated <- feedback.availability
-  # Convert columns starting from 4 to the last column to numeric
-  feedback.availability_updated[, 4:ncol(feedback.availability_updated)] <- lapply(
-    feedback.availability_updated[, 4:ncol(feedback.availability_updated)],
-    function(x) as.numeric(as.character(x))
-  )
-
-  feedback.availability_updated$row.sum <- rowSums(
-    feedback.availability_updated[, 4:ncol(feedback.availability_updated)],
-    na.rm = TRUE
-  )
-
-  # Remove "items_available_food_dry." from all column names
-  remove_values <- paste0(
-    "items_available_food_dry.|items_available_food_fresh.|",
-    "items_available_nfi.|items_unavailable.|items_available_livestock.|items_available_nutrition."
-  )
-
-  names(feedback.availability_updated) <- gsub(remove_values, "", names(feedback.availability_updated))
-
   # ---- Table - combined (items): ----
   get_first_row_value <- function(df, col_name) {
     if (!col_name %in% colnames(df)) {
@@ -2574,8 +2487,6 @@
     result.mssmeb <- rbind(result.mssmeb, state_rows)
   }
   
-
-  
   # ---- Table - combined (indices): ----
   # 1) overall indices:
   median.ind.overall <- median.overall %>% select(MSSMEB.food.basket, Food.price.index)
@@ -2651,8 +2562,6 @@
     result.ind <- rbind(result.ind, state_rows)
   }
 
-
-
   # ----  Table median all sheet: ----  
   
 median.table.overall <- median.overall %>% select(
@@ -2668,7 +2577,6 @@ median.table.overall <- median.overall %>% select(
   Bra
 )
 
-
 median.table <- median2 %>% select(
   State, County, Location, Sorghum.grain,
   Maize.grain, Wheat.flour, Rice,
@@ -2683,18 +2591,7 @@ median.table <- median2 %>% select(
   Pencil, Rubber, Sharpener,
   Sleeping.mat, Bamboo, Grass,
   Underwear, School.bag, Bra
-)
-
-
-median.table.small <- data.frame()
-
-median.table.small <- median.table %>%
-  select(-c(
-    Rubber.rope, Kanga, Solar.lamp, Plastic.bucket,
-    Sanitary.pad, Pen, Pencil, Rubber,
-    Sharpener, Sleeping.mat, Bamboo,
-    Grass, Underwear, School.bag, Bra
-  )) %>% ungroup()
+) %>% ungroup()
 
 result.table <- data.frame(
   County = character(),
@@ -2721,10 +2618,26 @@ result.table <- data.frame(
   Goat = numeric(),
   Chicken = numeric(),
   Milling.costs = numeric(),
+  Rubber.rope = numeric(),
+  Kanga = numeric(),
+  Solar.lamp = numeric(),
+  Plastic.bucket = numeric(),
+  Sanitary.pad = numeric(), 
+  Pen = numeric(), 
+  Pencil = numeric(), 
+  Rubber = numeric(),
+  Sharpener = numeric(), 
+  Sleeping.mat = numeric(), 
+  Bamboo = numeric(),
+  Grass = numeric(), 
+  Underwear = numeric(), 
+  School.bag = numeric(), 
+  Bra = numeric(),
+  
   stringsAsFactors = FALSE
 )
 
-for (state in unique(median.table.small$State)) {
+for (state in unique(median.table$State)) {
   result.table <- rbind(result.table, data.frame(
     County = state,
     Location = NA,
@@ -2750,11 +2663,26 @@ for (state in unique(median.table.small$State)) {
     Goat = NA,
     Chicken = NA,
     Milling.costs = NA,
+    Rubber.rope = NA,
+    Kanga = NA,
+    Solar.lamp = NA,
+    Plastic.bucket = NA,
+    Sanitary.pad = NA, 
+    Pen = NA, 
+    Pencil = NA, 
+    Rubber = NA,
+    Sharpener = NA, 
+    Sleeping.mat = NA, 
+    Bamboo = NA,
+    Grass = NA, 
+    Underwear = NA, 
+    School.bag = NA, 
+    Bra = NA,    
     stringsAsFactors = FALSE
   ))
 
   # Get all rows for this state and add them to the result.table
-  state_rows <- median.table.small %>%
+  state_rows <- median.table %>%
     filter(State == state) %>%
     select(
       County, Location, Sorghum.grain, Maize.grain,
@@ -2762,63 +2690,54 @@ for (state in unique(median.table.small$State)) {
       Sugar, Salt, Cooking.oil, Soap,
       Jerrycan, Mosquito.net, Exercise.book, Blanket,
       Cooking.pot, Plastic.sheet, Pole, Firewood,
-      Charcoal, Goat, Chicken, Milling.costs
+      Charcoal, Goat, Chicken, Milling.costs,
+      Rubber.rope, Kanga, Solar.lamp, Plastic.bucket,
+      Sanitary.pad, Pen, Pencil, Rubber,
+      Sharpener, Sleeping.mat, Bamboo,
+      Grass, Underwear, School.bag, Bra
     )
-  
   result.table <- rbind(result.table, state_rows)
 }
 
-
-
-
-
 # ----  Table - Stocks sheet: ----  
 stock.headers <- c(
-  "state",                                  "county",
-  "location",                               "sorghum_grain_stock_current",
-  "maize_grain_stock_current",              "wheat_flour_stock_current",
-  "rice_stock_current",                     "groundnuts_stock_current",
-  "beans_stock_current",                    "sugar_stock_current",
-  "salt_stock_current",                     "cooking_oil_stock_current",
+  "state",
+  "county",
+  "location",
+  "sorghum_grain_stock_current",
+  "maize_grain_stock_current",
+  "wheat_flour_stock_current",
+  "rice_stock_current",
+  "groundnuts_stock_current",
+  "beans_stock_current",
+  "sugar_stock_current",
+  "salt_stock_current",
+  "cooking_oil_stock_current",
   "soap_stock_current",
-  "jerrycan_stock_current",                 "mosquito_net_stock_current",
-  "exercise_book_stock_current",            "blanket_stock_current",
-  "cooking_pot_stock_current",              "plastic_sheet_stock_current",  
+  "jerrycan_stock_current",
+  "mosquito_net_stock_current",
+  "exercise_book_stock_current",
+  "blanket_stock_current",
+  "cooking_pot_stock_current",
+  "plastic_sheet_stock_current",
   "sleeping_mat_stock_current",
   "pen_available_stock_current",
-  "pencil_available_stock_current",         "rubber_available_stock_current",
-  "sharpener_available_stock_current",      "rubber_rope_available_stock_current",
-  "kanga_available_stock_current",          "solar_lamp_available_stock_current",
-  "plastic_bucket_available_stock_current", "sanitary_pads_available_stock_current",
+  "pencil_available_stock_current",
+  "rubber_available_stock_current",
+  "sharpener_available_stock_current",
+  "rubber_rope_available_stock_current",
+  "kanga_available_stock_current",
+  "solar_lamp_available_stock_current",
+  "plastic_bucket_available_stock_current",
+  "sanitary_pads_available_stock_current",
   "underwear_available_stock_current",
-  "school_bag_available_stock_current",     "bra_available_stock_current"
-)
-
-stock.headers.small <- c(
-  "state.x",                                "county",
-  "location",                               "sorghum_grain_stock_current",
-  "maize_grain_stock_current",              "wheat_flour_stock_current",
-  "rice_stock_current",                     "groundnuts_stock_current",
-  "beans_stock_current",                    "sugar_stock_current",
-  "salt_stock_current",                     "cooking_oil_stock_current",
-  "soap_stock_current",
-  "jerrycan_stock_current",                 "mosquito_net_stock_current",
-  "exercise_book_stock_current",            "blanket_stock_current",
-  "cooking_pot_stock_current",              "plastic_sheet_stock_current"
+  "school_bag_available_stock_current",
+  "bra_available_stock_current"
 )
 
 stock.table <- stock_level %>% select(stock.headers)
-
 stock.table <- stock.table %>% left_join(restock_duration, by = c("county" = "county", "location" = "location"))
-stock.table <- stock.table %>% select(- state.y)
-
-stock.table.small <- data.frame()
-
-stock.table.small <- stock.table %>%
-  select(stock.headers.small, ends_with("duration")) %>% 
-  ungroup()
-
-stock.table.small <- stock.table.small %>% rename(state = state.x)
+stock.table <- stock.table %>% select(- state.y) %>% rename(state = state.x) %>% ungroup()
 
 result.stock <- data.frame(
   county = character(),
@@ -2839,13 +2758,26 @@ result.stock <- data.frame(
   blanket_stock_current = numeric(),
   cooking_pot_stock_current = numeric(),
   plastic_sheet_stock_current = numeric(),
+  sleeping_mat_stock_current = numeric(),
+  pen_available_stock_current = numeric(),
+  pencil_available_stock_current = numeric(),
+  rubber_available_stock_current = numeric(),
+  sharpener_available_stock_current = numeric(),
+  rubber_rope_available_stock_current = numeric(),
+  kanga_available_stock_current = numeric(),
+  solar_lamp_available_stock_current = numeric(),
+  plastic_bucket_available_stock_current = numeric(),
+  sanitary_pads_available_stock_current = numeric(),
+  underwear_available_stock_current = numeric(),
+  school_bag_available_stock_current = numeric(),
+  bra_available_stock_current = numeric(),
   food_supplier_imported_duration = numeric(),
   food_supplier_local_duration = numeric(),
   nfi_supplier_duration = numeric(),
   stringsAsFactors = FALSE
 )
 
-for (st in unique(stock.table.small$state)) {
+for (st in unique(stock.table$state)) {
   result.stock <- rbind(result.stock, data.frame(
     county = st,
     location = NA,
@@ -2865,13 +2797,26 @@ for (st in unique(stock.table.small$state)) {
     blanket_stock_current = NA,
     cooking_pot_stock_current = NA,
     plastic_sheet_stock_current = NA,
+    sleeping_mat_stock_current = NA,
+    pen_available_stock_current = NA,
+    pencil_available_stock_current = NA,
+    rubber_available_stock_current = NA,
+    sharpener_available_stock_current = NA,
+    rubber_rope_available_stock_current = NA,
+    kanga_available_stock_current = NA,
+    solar_lamp_available_stock_current = NA,
+    plastic_bucket_available_stock_current = NA,
+    sanitary_pads_available_stock_current = NA,
+    underwear_available_stock_current = NA,
+    school_bag_available_stock_current = NA,
+    bra_available_stock_current = NA,
     food_supplier_imported_duration = NA,
     food_supplier_local_duration = NA,
     nfi_supplier_duration = NA,
     stringsAsFactors = FALSE
   ))
   
-  state_rows <- stock.table.small %>%
+  state_rows <- stock.table %>%
     filter(state == st) %>%
     select(
       county,
@@ -2892,15 +2837,25 @@ for (st in unique(stock.table.small$state)) {
       blanket_stock_current,
       cooking_pot_stock_current,
       plastic_sheet_stock_current,
+      sleeping_mat_stock_current,
+      pen_available_stock_current,
+      pencil_available_stock_current,
+      rubber_available_stock_current,
+      sharpener_available_stock_current,
+      rubber_rope_available_stock_current,
+      kanga_available_stock_current,
+      solar_lamp_available_stock_current,
+      plastic_bucket_available_stock_current,
+      sanitary_pads_available_stock_current,
+      underwear_available_stock_current,
+      school_bag_available_stock_current,
+      bra_available_stock_current,
       food_supplier_imported_duration,
       food_supplier_local_duration,
       nfi_supplier_duration,
     )
   result.stock <- rbind(result.stock, state_rows)
 }
-
-
-
 
 # ----  Box plot sheet: ----  
 boxplot.columns <- c(
@@ -2948,14 +2903,15 @@ plot_data <- bind_rows(
   plot_data.adeed5
 )
 
-# ----  load two new empty template files: ----
+# ----  load the empty template files: ----
 
-wb <- loadWorkbook("./data/JMMI_template1.xlsx")
+wb1 <- loadWorkbook("./data/JMMI_template1.xlsx")
 wb2 <- loadWorkbook("./data/JMMI_template2.xlsx")
+
 options("openxlsx.borderColour" = "#303030")
 options("openxlsx.borderStyle" = "thin")
+modifyBaseFont(wb1, fontSize = 10, fontColour = "#303030")
 
-modifyBaseFont(wb, fontSize = 10, fontColour = "#303030")
 percentage_style <- createStyle(numFmt = "0%")
 
 # special style for separating rows for some sheets line "Table - Median all" and "Table - Stock"
@@ -2964,72 +2920,68 @@ seperator_style <- createStyle(fontSize = 8, fgFill = "#909090")
 # a function for setting headers:
 set_median_header <- function(sheet_name) {
   if (sheet_name == "median") {
-    writeData(wb, sheet_name, x = "MEDIAN", startCol = 3, startRow = 2)
-    writeData(wb, sheet_name, x = "Six Months change", startCol = 3, startRow = 3)
-    writeData(wb, sheet_name, x = "Monthly change", startCol = 3, startRow = 4)
+    writeData(wb1, sheet_name, x = "MEDIAN", startCol = 3, startRow = 2)
+    writeData(wb1, sheet_name, x = "Six Months change", startCol = 3, startRow = 3)
+    writeData(wb1, sheet_name, x = "Monthly change", startCol = 3, startRow = 4)
   } else if (sheet_name == "median USD") {
-    writeData(wb, sheet_name, x = "MEDIAN", startCol = 3, startRow = 2)
+    writeData(wb1, sheet_name, x = "MEDIAN", startCol = 3, startRow = 2)
   }
 }
 
 # writing the relevant data frames into excel file: 
 # there are excel sheets that multiple data frames 
-writeData(wb, sheet = "quotation_raw", quotation, colNames = TRUE)
-writeData(wb, sheet = "availability", availability, colNames = TRUE)
-writeData(wb, sheet = "median_chg_1m", median.chg.1m, colNames = TRUE)
-writeData(wb, sheet = "median_chg_3m", median.chg.3m, colNames = TRUE)
-writeData(wb, sheet = "median_chg_long", median.chg.long, colNames = TRUE)
-writeData(wb, sheet = "median_chg_overall", median.chg.overall.1m, colNames = TRUE, startCol = 2)
-writeData(wb, sheet = "median_chg_overall", median.chg.overall.3m, colNames = TRUE, startRow = 4, startCol = 2)
-writeData(wb, sheet = "median_chg_overall", median.chg.overall.long, colNames = TRUE, startRow = 7, startCol = 2)
-addStyle(wb, sheet = "median_chg_overall", style = percentage_style, rows = c(2,5,8), cols = 2:ncol(median.chg.overall.1m), gridExpand = TRUE)
-writeData(wb, sheet = "expectation_price", expectation.price, colNames = TRUE, keepNA = FALSE)
-writeData(wb, sheet = "expectation_price", price_expectations, colNames = TRUE, rowNames = TRUE, startRow = 1, startCol = 8) 
-writeData(wb, sheet = "restock_raw", restock, colNames = TRUE)
-writeData(wb, sheet = "restock_duration", restock_duration, colNames = TRUE)
-writeData(wb, sheet = "supply", supply, colNames = TRUE)
-writeData(wb, sheet = "feedback_raw", feedback.export, colNames = TRUE)
-writeData(wb, sheet = "quotation_feedback", feedback.quotation, colNames = TRUE)
-writeData(wb, sheet = "feedback_availability_raw", feedback.availability, colNames = TRUE, startCol = 1, startRow = 3)
-writeData(wb, sheet = "restock_constraints", restock_constraints_df_2, colNames = TRUE, rowNames = TRUE)
+writeData(wb1, sheet = "quotation_raw", quotation, colNames = TRUE)
+writeData(wb1, sheet = "availability", availability, colNames = TRUE)
+writeData(wb1, sheet = "median_chg_1m", median.chg.1m, colNames = TRUE)
+writeData(wb1, sheet = "median_chg_3m", median.chg.3m, colNames = TRUE)
+writeData(wb1, sheet = "median_chg_long", median.chg.long, colNames = TRUE)
+writeData(wb1, sheet = "median_chg_overall", median.chg.overall.1m, colNames = TRUE, startCol = 2)
+writeData(wb1, sheet = "median_chg_overall", median.chg.overall.3m, colNames = TRUE, startRow = 4, startCol = 2)
+writeData(wb1, sheet = "median_chg_overall", median.chg.overall.long, colNames = TRUE, startRow = 7, startCol = 2)
+addStyle(wb1, sheet = "median_chg_overall", style = percentage_style, rows = c(2,5,8), cols = 2:ncol(median.chg.overall.1m), gridExpand = TRUE)
+writeData(wb1, sheet = "expectation_price", expectation.price, colNames = TRUE, keepNA = FALSE)
+writeData(wb1, sheet = "expectation_price", price_expectations, colNames = TRUE, rowNames = TRUE, startRow = 1, startCol = 8) 
+writeData(wb1, sheet = "restock_raw", restock, colNames = TRUE)
+writeData(wb1, sheet = "restock_duration", restock_duration, colNames = TRUE)
+writeData(wb1, sheet = "supply", supply, colNames = TRUE)
+writeData(wb1, sheet = "feedback_raw", feedback.export, colNames = TRUE)
+writeData(wb1, sheet = "quotation_feedback", feedback.quotation, colNames = TRUE)
+writeData(wb1, sheet = "feedback_availability_raw", feedback.availability, colNames = TRUE, startCol = 1, startRow = 3)
+writeData(wb1, sheet = "restock_constraints", restock_constraints_df_2, colNames = TRUE, rowNames = TRUE)
 writeData(wb2, sheet = "transport_modalities", transport_matrix, colNames = TRUE, rowNames = TRUE)
 writeData(wb2, sheet = "transport_modalities", payment_modalities_df_2, colNames = TRUE, rowNames = TRUE, startCol = 5)
-writeData(wb, sheet = "quote_check", quotation_check_unit, colNames = TRUE, rowNames = FALSE)
+writeData(wb1, sheet = "quote_check", quotation_check_unit, colNames = TRUE, rowNames = FALSE)
 writeData(wb2, sheet = "trade", nfi_trade, colNames = TRUE, rowNames = FALSE)
 writeData(wb2, sheet = "trade", locally_supplied_trade, colNames = TRUE, rowNames = FALSE, startCol = 9)
 writeData(wb2, sheet = "trade", mobile_money_reason, colNames = TRUE, rowNames = FALSE, startCol = 17)
 
 # updated sheets: 
-writeData(wb, "median", t(base.median.col.order), colNames = FALSE, startRow = 1, startCol = 1)
-writeData(wb, "median", median.overall, colNames = FALSE, startRow = 2, startCol = 4)
-writeData(wb, "median", median.change, colNames = FALSE, startRow = 3, startCol = 4)
-writeData(wb, "median", median2, colNames = FALSE, startRow = 5)
-writeData(wb, "median USD", t(columns_to_keep), colNames = FALSE, startRow = 1, startCol = 1)
-writeData(wb, "median USD", median.usd.overall, colNames = FALSE, startRow = 2, startCol = 4)
-writeData(wb, "median USD", median.usd, colNames = FALSE, startRow = 3)
 
+writeData(wb1, "median", median.overall, colNames = FALSE, startRow = 2, startCol = 4)
+writeData(wb1, "median", median.change, colNames = FALSE, startRow = 3, startCol = 4)
+writeData(wb1, "median", median2, colNames = FALSE, startRow = 5)
 set_median_header("median")
+
+# writeData(wb1, "median USD", t(columns_to_keep), colNames = FALSE, startRow = 1, startCol = 1)
+writeData(wb1, "median USD", median.usd.overall, colNames = FALSE, startRow = 2, startCol = 4)
+writeData(wb1, "median USD", median.usd, colNames = FALSE, startRow = 3)
 set_median_header("median USD")
 
-writeData(wb, "minmax", t(item_col_names_full), colNames = FALSE, startRow = 1, startCol = 4)
-# Merge every three cells
-for (i in seq(4, length(item_col_names_full) + 1, by = 3)) {
-  mergeCells(wb, sheet = "minmax", cols = i:(i + 2), rows = 1)
+writeData(wb1, "minmax", min.max, colNames = FALSE, startRow = 3, startCol = 1)
+
+for (i in seq(6, 135, by = 3)) {
+  addStyle(wb1, sheet = "minmax", style = percentage_style, rows = 3:nrow(min.max), cols = i)
 }
 
-writeData(wb, "minmax", min.max, colNames = TRUE, startRow = 2, startCol = 1)
-writeData(wb, "median_wholesale", t(location.headers), colNames = FALSE, startRow = 1, startCol = 1)
-writeData(wb, "median_wholesale", headers3, colNames = FALSE, startRow = 2, startCol = 3)
-writeData(wb, "median_wholesale", median.wholesale.overall2, colNames = TRUE, startRow = 1, startCol = 4)
-writeData(wb, "median_wholesale", median.wholesale, colNames = FALSE, startRow = 5, startCol = 1)
+writeData(wb1, "median_wholesale", t(location.headers), colNames = FALSE, startRow = 1, startCol = 1)
+writeData(wb1, "median_wholesale", headers3, colNames = FALSE, startRow = 2, startCol = 3)
+writeData(wb1, "median_wholesale", median.wholesale.overall2, colNames = TRUE, startRow = 1, startCol = 4)
+writeData(wb1, "median_wholesale", median.wholesale, colNames = FALSE, startRow = 5, startCol = 1)
 writeData(wb2, "road_border", road2, colNames = TRUE, startRow = 1, startCol = 1)
 writeData(wb2, "road_border", border2, colNames = TRUE, startRow = 1, startCol = 8)
-writeData(wb, "median ETB", median.etb.full, colNames = TRUE, startRow = 1, startCol = 1)
-writeData(wb, "median ETB", "overal median", colNames = FALSE, startRow = 2, startCol = 3)
-writeData(wb, "stock_level", stock_level_rounded, colNames = TRUE, startRow = 1, startCol = 1)
-writeData(wb, "feedback_availability", t(location.headers), colNames = FALSE, startRow = 2, startCol = 1)
-writeData(wb, "feedback_availability", t(feedback.items.headers), colNames = FALSE, startRow = 2, startCol = 4)
-writeData(wb, "feedback_availability", feedback.availability_updated, colNames = FALSE, startRow = 3, startCol = 1)
+writeData(wb1, "median ETB", median.etb.full, colNames = TRUE, startRow = 1, startCol = 1)
+writeData(wb1, "median ETB", "overal median", colNames = FALSE, startRow = 2, startCol = 3)
+writeData(wb1, "stock_level", stock_level_rounded, colNames = TRUE, startRow = 1, startCol = 1)
 writeData(wb2, "Table - combined", food.data[, -1], colNames = FALSE, startRow = 4, startCol = 3)
 writeData(wb2, "Table - combined", non.food.data[, -1], colNames = FALSE, startRow = 15, startCol = 3)
 writeData(wb2, "Table - combined", livestock.data[, -1], colNames = FALSE, startRow = 41, startCol = 3)
@@ -3050,21 +3002,19 @@ for (i in state_rows.ind.full) {
   addStyle(wb2, sheet = "Table - combined", style = seperator_style, rows = i + 1, cols = 15:22)
 }
 
-state_rows.table <- state_rows_fun(median.table$State)
-for (i in state_rows.table) {
-  addStyle(wb2, sheet = "Table - Median all", style = seperator_style, rows = i, cols = 1:24)
-}
-
 writeData(wb2, "Table - Median all", result.table, colNames = FALSE, startRow = 2, startCol = 1)
-writeData(wb2, "Table - Stock", result.stock, colNames = FALSE, startRow = 2, startCol = 1)
-
-state_rows.table.small <- state_rows_fun(stock.table.small$state)
-for (i in state_rows.table.small) {
-  addStyle(wb2, sheet = "Table - Stock", style = seperator_style, rows = i, cols = 1:21)
+state_rows.median <- state_rows_fun(median.table$State)
+for (i in state_rows.median) {
+  addStyle(wb2, sheet = "Table - Median all", style = seperator_style, rows = i, cols = 1:39)
 }
 
-writeData(wb, "boxplot", plot_data, colNames = FALSE, startRow = 2, startCol = 2)
+writeData(wb2, "Table - Stock", result.stock, colNames = FALSE, startRow = 2, startCol = 1)
+state_rows.stock <- state_rows_fun(stock.table$state)
+for (i in state_rows.stock) {
+  addStyle(wb2, sheet = "Table - Stock", style = seperator_style, rows = i, cols = 1:34)
+}
 
+writeData(wb1, "boxplot", plot_data, colNames = FALSE, startRow = 2, startCol = 2)
 
 # some of sheets are necessary for dashboard, functionality, etc but we don't need directly,
 # therefor all of them should be hidden in the output file.
@@ -3081,12 +3031,11 @@ writeData(wb, "boxplot", plot_data, colNames = FALSE, startRow = 2, startCol = 2
 # feedback_raw
 # quote_check
 
-
-for (i in 17:28) {
-  sheetVisibility(wb)[i] <- FALSE 
+for (i in 18:28) {
+  sheetVisibility(wb1)[i] <- FALSE 
 }
 
 # final results as excel files:
-saveWorkbook(wb, result1.file.path, overwrite = TRUE)
+saveWorkbook(wb1, result1.file.path, overwrite = TRUE)
 saveWorkbook(wb2, result2.file.path, overwrite = TRUE)
 
